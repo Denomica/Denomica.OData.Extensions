@@ -23,6 +23,11 @@ namespace Denomica.OData.Extensions
             return new ODataUriParser(model, relativeUri);
         }
 
+        public static EdmEntityType FindEntityType<TEntity>(this IEdmModel model)
+        {
+            return model.FindEntityType(typeof(TEntity));
+        }
+
         public static EdmEntityType FindEntityType(this IEdmModel model, Type type)
         {
             return model.FindDeclaredType(type.FullName) as EdmEntityType;
@@ -31,6 +36,16 @@ namespace Denomica.OData.Extensions
         public static EdmEntityContainer GetEntityContainer(this IEdmModel model)
         {
             return (EdmEntityContainer)model.EntityContainer;
+        }
+
+        public static string ToCamelCase(this string s)
+        {
+            if(s?.Length > 1)
+            {
+                return s.Substring(0, 1).ToLower() + s.Substring(1);
+            }
+
+            return s?.ToLower();
         }
     }
 }

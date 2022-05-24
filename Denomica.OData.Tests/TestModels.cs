@@ -23,6 +23,8 @@ namespace Denomica.OData.Tests
     {
         public DateTime? LastDayOfEmployment { get; set; }
 
+        public DateTime FirstDayOfEmployment { get; set; }
+
         public Employee Manager { get; set; } = null!;
 
         public Person? EmergencyContact { get; set; }

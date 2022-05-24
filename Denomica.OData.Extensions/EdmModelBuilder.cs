@@ -118,158 +118,30 @@ namespace Denomica.OData.Extensions
                 flags |= BindingFlags.DeclaredOnly;
             }
 
-            foreach(var p in from x in entityType.GetProperties(flags) select x)
+            var simpleProps = from x in entityType.GetProperties(flags)
+                              where
+                                    (!x.PropertyType.IsClass || x.PropertyType == typeof(string))
+                                    && !x.PropertyType.IsArray
+                                    && !x.PropertyType.IsEnum
+                              select x;
+            foreach(var p in simpleProps)
             {
                 var propertyConfig = entityConfig.AddProperty(p);
                 propertyConfig.Name = this.ModifyPropertyName(p.Name);
                 configs.Add(propertyConfig);
             }
 
+            var complexProps = from x in entityType.GetProperties(flags)
+                               where this.EntityTypes.Contains(x.PropertyType)
+                               select x;
+            foreach(var p in complexProps)
+            {
+                var propertyConfig = entityConfig.AddNavigationProperty(p, EdmMultiplicity.ZeroOrOne);
+                propertyConfig.Name = this.ModifyPropertyName(p.Name);
+                configs.Add(propertyConfig);
+            }
+
             return configs;
-        }
-
-        private void AddEntityProperties(EdmModel model, EdmStructuredType schemaType, Type sourceType)
-        {
-            var flags = BindingFlags.Public | BindingFlags.Instance;
-            if(null != schemaType.BaseType)
-            {
-                // If the base type is set for the entity we are adding properties to,
-                // then we know the base entity is inlcluded in the model, so we don't
-                // need to add inherited properties to the current entity.
-                flags |= BindingFlags.DeclaredOnly;
-            }
-
-            foreach (var p in from x in sourceType.GetProperties(flags) select x)
-            {
-                bool isNullable = Nullable.GetUnderlyingType(p.PropertyType) != null;
-
-                var primitiveType = this.GetPrimitiveType(p.PropertyType);
-                if (primitiveType.HasValue)
-                {
-                    schemaType.AddStructuralProperty(this.ModifyPropertyName(p.Name), primitiveType.Value, isNullable);
-                }
-                else
-                {
-                    // If the property is not a primitive type, but we find the property's type
-                    // among the entities included in the model build, then we add a reference
-                    // to that type for the property.
-                    var entityType = this.EntityTypes.FirstOrDefault(x => x == p.PropertyType);
-                    if(null != entityType)
-                    {
-                        var propertyType = this.BuildEntityType(model, entityType);
-                        schemaType.AddStructuralProperty(this.ModifyPropertyName(p.Name), new EdmEntityTypeReference(propertyType, isNullable));
-                    }
-                }
-            }
-        }
-
-        private EdmEntityType BuildEntityType(EdmModel model, Type entityType)
-        {
-            var baseType = this.EntityTypes.FirstOrDefault(x => x == entityType.BaseType);
-            EdmEntityType parentType = null;
-            if(null != baseType)
-            {
-                // If the base type is found among the entities included in the model build,
-                // then we first must build that so that we can specify it as a base
-                // type for the current entity.
-                parentType = this.BuildEntityType(model, baseType);
-            }
-
-            EdmEntityType addedType = model.FindEntityType(entityType);
-            if(null == addedType)
-            {
-                // Only add the entity to the model if it has not yet been added.
-                if(null != parentType)
-                {
-                    addedType = model.AddEntityType(entityType.Namespace, entityType.Name, parentType);
-                }
-                else
-                {
-                    addedType = model.AddEntityType(entityType.Namespace, entityType.Name);
-                }
-
-                this.AddEntityProperties(model, addedType, entityType);
-            }
-
-            return addedType;
-        }
-
-        private EdmPrimitiveTypeKind? GetPrimitiveType(Type type)
-        {
-            var t = Nullable.GetUnderlyingType(type) ?? type;
-
-            EdmPrimitiveTypeKind? pType = null;
-
-            if (t == typeof(string))
-            {
-                pType = EdmPrimitiveTypeKind.String;
-            }
-            else if (t == typeof(bool))
-            {
-                pType = EdmPrimitiveTypeKind.Boolean;
-            }
-            else if (t == typeof(byte))
-            {
-                pType = EdmPrimitiveTypeKind.Byte;
-            }
-            else if (t == typeof(sbyte))
-            {
-                pType = EdmPrimitiveTypeKind.SByte;
-            }
-            else if (t == typeof(int))
-            {
-                pType = EdmPrimitiveTypeKind.Int32;
-            }
-            else if (t == typeof(short))
-            {
-                pType = EdmPrimitiveTypeKind.Int16;
-            }
-            else if (t == typeof(long))
-            {
-                pType = EdmPrimitiveTypeKind.Int64;
-            }
-            else if (t == typeof(DateTime))
-            {
-                pType = EdmPrimitiveTypeKind.DateTimeOffset;
-            }
-            else if (t == typeof(DateTimeOffset))
-            {
-                pType = EdmPrimitiveTypeKind.DateTimeOffset;
-            }
-            else if (t == typeof(TimeSpan))
-            {
-                pType = EdmPrimitiveTypeKind.Duration;
-            }
-            else if (t == typeof(Guid))
-            {
-                pType = EdmPrimitiveTypeKind.Guid;
-            }
-            else if (t == typeof(double))
-            {
-                pType = EdmPrimitiveTypeKind.Double;
-            }
-            else if (t == typeof(decimal))
-            {
-                pType = EdmPrimitiveTypeKind.Decimal;
-            }
-            else if (t == typeof(float))
-            {
-                pType = EdmPrimitiveTypeKind.Single;
-            }
-            else if (t == typeof(byte))
-            {
-                pType = EdmPrimitiveTypeKind.Byte;
-            }
-            else if (t == typeof(sbyte))
-            {
-                pType = EdmPrimitiveTypeKind.SByte;
-            }
-            else if (t == typeof(byte[]))
-            {
-                pType = EdmPrimitiveTypeKind.Binary;
-            }
-
-            return pType;
         }
 
         private string ModifyPropertyName(string name)
