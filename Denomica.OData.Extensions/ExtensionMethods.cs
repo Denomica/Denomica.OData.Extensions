@@ -2,6 +2,7 @@
 using Microsoft.OData.UriParser;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Denomica.OData.Extensions
@@ -38,6 +39,22 @@ namespace Denomica.OData.Extensions
             return (EdmEntityContainer)model.EntityContainer;
         }
 
+        public static IEnumerable<string> SelectedPaths(this SelectExpandClause clause)
+        {
+            if(null != clause && !clause.AllSelected)
+            {
+                foreach(var path in from x in clause.SelectedItems where x is PathSelectItem select (PathSelectItem)x)
+                {
+                    foreach(var selectedPath in path.SelectedPath)
+                    {
+                        yield return selectedPath.Identifier;
+                    }
+                }
+            }
+
+            yield break;
+        }
+
         public static string ToCamelCase(this string s)
         {
             if(s?.Length > 1)
@@ -46,6 +63,25 @@ namespace Denomica.OData.Extensions
             }
 
             return s?.ToLower();
+        }
+
+        public static IList<Tuple<SingleValuePropertyAccessNode, OrderByDirection>> ToList(this OrderByClause clause)
+        {
+            var list = new List<Tuple<SingleValuePropertyAccessNode, OrderByDirection>>();
+
+            var parent = clause;
+
+            while(null != parent)
+            {
+                if(parent.Expression is SingleValuePropertyAccessNode)
+                {
+                    list.Add(new Tuple<SingleValuePropertyAccessNode, OrderByDirection>((SingleValuePropertyAccessNode)parent.Expression, parent.Direction));
+                }
+
+                parent = parent.ThenBy;
+            }
+
+            return list;
         }
     }
 }

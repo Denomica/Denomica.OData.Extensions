@@ -50,16 +50,34 @@ namespace Denomica.OData.Extensions
             return this;
         }
 
-        public EdmModelBuilder AddEntityType<TEntity>()
+        public EdmModelBuilder AddEntityType<TEntity>(string keyPropertyName = null, string entitySetName = null)
         {
-            return this.AddEntityType(typeof(TEntity));
+            this.AddEntityType(typeof(TEntity));
+            if(keyPropertyName?.Length > 0)
+            {
+                this.AddEntityKey<TEntity>(keyPropertyName);
+            }
+            if(entitySetName?.Length > 0)
+            {
+                this.AddEntitySet<TEntity>(entitySetName);
+            }
+
+            return this;
         }
 
-        public EdmModelBuilder AddEntityType(Type entityType)
+        public EdmModelBuilder AddEntityType(Type entityType, string keyPropertyName = null, string entitySetName = null)
         {
             if (!this.EntityTypes.Contains(entityType))
             {
                 this.EntityTypes.Add(entityType);
+            }
+            if(keyPropertyName?.Length > 0)
+            {
+                this.AddEntityKey(entityType, keyPropertyName);
+            }
+            if (entitySetName?.Length > 0)
+            {
+                this.AddEntitySet(entityType, entitySetName);
             }
 
             return this;

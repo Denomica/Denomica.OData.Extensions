@@ -150,6 +150,53 @@ namespace Denomica.OData.Tests
             var filter = parser.ParseFilter();
             Assert.IsNotNull(filter?.Expression);
 
+            var orderBy = parser.ParseOrderBy();
+            Assert.IsNull(orderBy);
+        }
+
+        [TestMethod]
+        public void ParseUri03()
+        {
+            var model = new EdmModelBuilder()
+                .AddEntityType<Person>(nameof(Person.Id), "persons")
+                .Build();
+
+            var parser = model.CreateUriParser("/persons?$filter=dateOfBirth lt 2000-01-01");
+            var filter = parser.ParseFilter();
+            Assert.IsNotNull(filter);
+        }
+
+        [TestMethod]
+        public void ParseUri04()
+        {
+            var model = new EdmModelBuilder()
+                .AddEntityType<Person>(nameof(Person.Id), "persons")
+                .Build();
+            var parser = model.CreateUriParser("/persons?$select=firstName,lastName&$filter=(dateOfBirth ge 1980-01-01 and dateOfBirth lt 2000-01-01) or firstName eq 'Peter'&$orderby=dateOfBirth desc");
+            var select = parser.ParseSelectAndExpand();
+            var filter = parser.ParseFilter();
+            var orderBy = parser.ParseOrderBy();
+
+            Assert.IsNotNull(select);
+            Assert.IsNotNull(filter);
+            Assert.IsNotNull(orderBy);
+        }
+
+        [TestMethod]
+        public void ParseUri05()
+        {
+            var parser = new EdmModelBuilder()
+                .AddEntityType<Person>("Id", "persons")
+                .Build()
+                .CreateUriParser("/persons?$orderby=lastName desc,firstName");
+
+            var orderBy = parser.ParseOrderBy();
+            Assert.IsNotNull(orderBy);
+            Assert.IsNotNull(orderBy.ThenBy);
+
+            var orderByList = orderBy.ToList();
+            Assert.IsNotNull(orderByList);
+            Assert.AreEqual(2, orderByList.Count);
         }
     }
 }
