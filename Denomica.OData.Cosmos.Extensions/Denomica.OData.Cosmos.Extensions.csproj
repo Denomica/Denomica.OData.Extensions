@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+	  <Copyright>Copyright (c) 2022 Denomica Oy</Copyright>
+	  <PackageReadmeFile>readme.md</PackageReadmeFile>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <Version>0.9.0-preview</Version>
+	  <Description>A library that exposes functionality for converting OData parameters into a QueryDefinition object for Cosmos DB.</Description>
+	  <PackageTags>OData;Azure;Cosmos DB;CosmosDB</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,5 +18,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Denomica.OData.Extensions\Denomica.OData.Extensions.csproj" />
   </ItemGroup>
+
+	<ItemGroup>
+		<None Include="readme.md" Pack="True" PackagePath="\" />
+	</ItemGroup>
 
 </Project>
