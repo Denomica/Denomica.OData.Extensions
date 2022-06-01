@@ -9,6 +9,7 @@
 	  <Version>0.9.1-preview</Version>
 	  <Description>A library that exposes functionality for converting OData parameters into a QueryDefinition object for Cosmos DB.</Description>
 	  <PackageTags>OData;Azure;Cosmos DB;CosmosDB</PackageTags>
+	  <PackageProjectUrl>https://github.com/Denomica/Denomica.OData.Extensions/wiki</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

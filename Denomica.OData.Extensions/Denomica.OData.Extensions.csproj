@@ -10,6 +10,7 @@
 	  <Description>Utilities for processing OData parameters in an HTTP request.</Description>
 	  <RepositoryUrl>https://github.com/Denomica/Denomica.OData.Extensions</RepositoryUrl>
 	  <PackageTags>OData</PackageTags>
+	  <PackageProjectUrl>https://github.com/Denomica/Denomica.OData.Extensions/wiki</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
