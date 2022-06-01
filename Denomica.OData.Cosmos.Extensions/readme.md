@@ -2,6 +2,12 @@
 
 A library that exposes functionality for converting OData parameters into a [`QueryDefinition`](https://docs.microsoft.com/dotnet/api/microsoft.azure.cosmos.querydefinition) object for Cosmos DB.
 
+## Documentation
+
+The documentation for this library is available on the [library wiki](https://github.com/Denomica/Denomica.OData.Extensions/wiki).
+
+> Note! The wiki is still heavily under development. There will be improvements to the documentation.
+
 ## Versions
 
 ### 0.9.x-preview
