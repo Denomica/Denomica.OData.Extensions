@@ -198,5 +198,51 @@ namespace Denomica.OData.Tests
             Assert.IsNotNull(orderByList);
             Assert.AreEqual(2, orderByList.Count);
         }
+
+        [TestMethod]
+        public void ParseUri06()
+        {
+            var parser = new EdmModelBuilder()
+                .AddEntityType<Person>()
+                .AddEntityKey<Person>("Id")
+                .AddEntitySet<Person>("persons")
+                .Build()
+                .CreateUriParser("api/persons");
+
+            Assert.IsNotNull(parser);
+
+            var filter = parser.ParseFilter();
+            Assert.IsNull(filter);
+        }
+
+        [TestMethod]
+        public void ParseUri07()
+        {
+            var parser = new EdmModelBuilder()
+                .AddEntityType<Person>("Id")
+                .CreateUriParser<Person>(new Uri("https://app.host.com/api/organizations/1234/departments/5678/persons?$filter=dateOfBirth lt 1980-01-01"));
+
+            var filter = parser.ParseFilter();
+            Assert.IsNotNull(filter);
+        }
+
+        [TestMethod]
+        public void ParseUri08()
+        {
+            var parser = new EdmModelBuilder()
+                .AddEntityType<Person>("Id")
+                .CreateUriParser<Person>("https://app.host.com/api/organizations/1234/departments/5678/persons?$filter=dateOfBirth ge 1971-01-01");
+
+            var filter = parser.ParseFilter();
+            Assert.IsNotNull(filter);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException), AllowDerivedTypes = false)]
+        public void ParseUri09()
+        {
+            var parser = new EdmModelBuilder()
+                .CreateUriParser<Person>("/");
+        }
     }
 }
