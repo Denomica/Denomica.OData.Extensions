@@ -244,5 +244,19 @@ namespace Denomica.OData.Tests
             var parser = new EdmModelBuilder()
                 .CreateUriParser<Person>("/");
         }
+
+        [TestMethod]
+        public void ParseUri10()
+        {
+            var parser = new EdmModelBuilder()
+                .AddEntityType<Person>("Id")
+                .CreateUriParser<Person>("/persons?$top=10&$skip=5");
+
+            var top = parser.ParseTop();
+            var skip = parser.ParseSkip();
+
+            Assert.AreEqual(10, top);
+            Assert.AreEqual(5, skip);
+        }
     }
 }

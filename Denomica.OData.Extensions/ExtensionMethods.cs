@@ -16,26 +16,22 @@ namespace Denomica.OData.Extensions
         public static ODataUriParser CreateUriParser(this IEdmModel model, string uri)
         {
             var u = new Uri(uri, UriKind.RelativeOrAbsolute);
-            if (!u.IsAbsoluteUri)
-            {
-                var pathPrefix = uri.StartsWith("/") ? "" : "/";
-                u = new Uri($"odata://host{pathPrefix}{uri}");
-            }
             return model.CreateUriParser(u);
         }
 
         public static ODataUriParser CreateUriParser(this IEdmModel model, Uri uri)
         {
-            if (!uri.IsAbsoluteUri) throw new ArgumentException("The given URI must be an absolute URI.", nameof(uri));
-            if(uri.LocalPath.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries).Length == 0)
+            var u = uri.MakeAbsolute();
+
+            if(u.LocalPath.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries).Length == 0)
             {
-                throw new ArgumentException("The given URI must specify a path with at least one segment.", nameof(uri));
+                throw new ArgumentException("The given URI must specify a path with at least one segment.", nameof(u));
             }
 
-            var pathOnlyUri = uri.GetLeftPart(UriPartial.Path).ToString();
+            var pathOnlyUri = u.GetLeftPart(UriPartial.Path).ToString();
             var rootUri = new Uri(pathOnlyUri.Substring(0, pathOnlyUri.LastIndexOf('/')));
 
-            return new ODataUriParser(model, rootUri, uri);
+            return new ODataUriParser(model, rootUri, u);
         }
 
         public static ODataUriParser CreateUriParser<TEntity>(this EdmModelBuilder builder, string uri)
@@ -45,7 +41,8 @@ namespace Denomica.OData.Extensions
 
         public static ODataUriParser CreateUriParser<TEntity>(this EdmModelBuilder builder, Uri uri)
         {
-            var u = uri.IsAbsoluteUri ? new Uri(uri.PathAndQuery, UriKind.Relative) : uri;
+
+            var u = uri.MakeAbsolute();
             var path = u.OriginalString.Contains('?') ? u.OriginalString.Substring(0, u.OriginalString.IndexOf('?')) : u.OriginalString;
             var segments = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if(segments.Length > 1)
@@ -116,6 +113,20 @@ namespace Denomica.OData.Extensions
             }
 
             return list;
+        }
+
+
+
+        private static Uri MakeAbsolute(this Uri uri, string scheme = "odata", string host = "host")
+        {
+            var u = uri;
+            if(!uri.IsAbsoluteUri)
+            {
+                var pathPrefix = uri.OriginalString.StartsWith("/") ? "/" : "";
+                u = new Uri($"{scheme}://{host}{pathPrefix}{uri.OriginalString}");
+            }
+
+            return u;
         }
     }
 }
