@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace Denomica.OData.Extensions
 {
@@ -12,6 +13,30 @@ namespace Denomica.OData.Extensions
     /// </summary>
     public static class ExtensionMethods
     {
+
+        public static Uri AppendFilter(this Uri uri, string filterExpression)
+        {
+            var parameters = HttpUtility.ParseQueryString(uri.Query);
+            var filter = parameters["$filter"];
+            if(filter?.Length > 0)
+            {
+                parameters["$filter"] = $"{filter} and {filterExpression}";
+            }
+            else
+            {
+                parameters["$filter"] = filterExpression;
+            }
+
+            var uriBuilder = new StringBuilder(uri.GetLeftPart(UriPartial.Path)).Append('?');
+            foreach(var key in parameters.AllKeys)
+            {
+                uriBuilder.Append(key)
+                    .Append("=")
+                    .Append(parameters[key]);
+            }
+
+            return new Uri(uriBuilder.ToString());
+        }
 
         public static ODataUriParser CreateUriParser(this IEdmModel model, string uri)
         {

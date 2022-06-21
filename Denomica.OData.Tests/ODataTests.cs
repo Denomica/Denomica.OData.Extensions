@@ -13,6 +13,28 @@ namespace Denomica.OData.Tests
     [TestClass]
     public class ODataTests
     {
+
+        [TestMethod]
+        public void AppendFilter01()
+        {
+            var uri = new Uri("https://host/path?$filter=foo eq 'bar'")
+                .AppendFilter("age ge 18");
+
+            Assert.AreEqual("https://host/path?$filter=foo eq 'bar' and age ge 18", uri.ToString());
+        }
+
+        [TestMethod]
+        public void AppendFilter02()
+        {
+            var uri = new Uri("https://host:1234")
+                .AppendFilter("foo eq 'bar'");
+
+            Assert.AreEqual("https://host:1234/?$filter=foo eq 'bar'", uri.ToString());
+        }
+
+
+
+
         [TestMethod]
         public void BuildModel01()
         {
