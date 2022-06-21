@@ -38,6 +38,16 @@ namespace Denomica.OData.Extensions
             return new Uri(uriBuilder.ToString());
         }
 
+        public static Uri AppendFilterIf(this Uri uri, string filterExpression, bool condition)
+        {
+            if(condition)
+            {
+                uri = uri.AppendFilter(filterExpression);
+            }
+
+            return uri;
+        }
+
         public static ODataUriParser CreateUriParser(this IEdmModel model, string uri)
         {
             var u = new Uri(uri, UriKind.RelativeOrAbsolute);
