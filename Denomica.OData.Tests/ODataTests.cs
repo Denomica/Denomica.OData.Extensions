@@ -32,6 +32,15 @@ namespace Denomica.OData.Tests
             Assert.AreEqual("https://host:1234/?$filter=foo eq 'bar'", uri.ToString());
         }
 
+        [TestMethod]
+        public void AppendFilter03()
+        {
+            var uri = new Uri("http://host.name/default.aspx?foo=bar")
+                .AppendFilter("age ge 18");
+
+            Assert.AreEqual("http://host.name/default.aspx?foo=bar&$filter=age ge 18", uri.ToString());
+        }
+
 
 
 

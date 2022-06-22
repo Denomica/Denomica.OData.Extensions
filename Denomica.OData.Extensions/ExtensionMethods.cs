@@ -28,11 +28,16 @@ namespace Denomica.OData.Extensions
             }
 
             var uriBuilder = new StringBuilder(uri.GetLeftPart(UriPartial.Path)).Append('?');
+            int keyCount = 0;
             foreach(var key in parameters.AllKeys)
             {
+                if (keyCount > 0) uriBuilder.Append('&');
+
                 uriBuilder.Append(key)
                     .Append("=")
                     .Append(parameters[key]);
+
+                keyCount++;
             }
 
             return new Uri(uriBuilder.ToString());
