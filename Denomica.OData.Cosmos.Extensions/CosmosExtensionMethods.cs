@@ -108,23 +108,28 @@ namespace Denomica.OData.Cosmos.Extensions
 
         private static QueryDefinitionBuilder AppendFilterNode(this QueryDefinitionBuilder builder, BinaryOperatorNode node)
         {
+            Func<SingleValueNode, bool> isBinaryOr = svNode =>
+            {
+                return svNode is BinaryOperatorNode && ((BinaryOperatorNode)svNode).OperatorKind == BinaryOperatorKind.Or;
+            };
+
             switch (node.OperatorKind)
             {
                 case BinaryOperatorKind.And:
                     builder
                         .AppendFilterNode(node.Left)
                         .AppendQueryText(" and ")
+                        .OpenParenthesisIf(isBinaryOr(node.Right))
                         .AppendFilterNode(node.Right)
+                        .CloseParenthesisIf(isBinaryOr(node.Right))
                         ;
                     break;
 
                 case BinaryOperatorKind.Or:
                     builder
-                        .AppendQueryText(" (")
                         .AppendFilterNode(node.Left)
-                        .AppendQueryText(") or (")
+                        .AppendQueryText(" or ")
                         .AppendFilterNode(node.Right)
-                        .AppendQueryText(")")
                         ;
                     break;
 
@@ -169,12 +174,42 @@ namespace Denomica.OData.Cosmos.Extensions
         {
             var name = $"@p{builder.Parameters.Count}";
 
+            object value = node.Value;
+            if(value is Microsoft.OData.Edm.Date)
+            {
+                // We need to convert an Edm.Date to a DateTime, because otherwise filtering on dates
+                // will not work and produce the required result.
+                var dt = (Microsoft.OData.Edm.Date)node.Value;
+                value = new DateTime(dt.Year, dt.Month, dt.Day);
+            }
+
             return builder
                 .AppendQueryText(" ")
                 .AppendQueryText(name)
-                .WithParameter(name, node.Value)
+                .WithParameter(name, value)
                 ;
         }
 
+        private static QueryDefinitionBuilder OpenParenthesis(this QueryDefinitionBuilder builder)
+        {
+            return builder.AppendQueryText("(");
+        }
+
+        private static QueryDefinitionBuilder OpenParenthesisIf(this QueryDefinitionBuilder builder, bool condition)
+        {
+            if (condition) builder.OpenParenthesis();
+            return builder;
+        }
+
+        private static QueryDefinitionBuilder CloseParenthesis(this QueryDefinitionBuilder builder)
+        {
+            return builder.AppendQueryText(")");
+        }
+
+        private static QueryDefinitionBuilder CloseParenthesisIf(this QueryDefinitionBuilder builder, bool condition)
+        {
+            if (condition) builder.CloseParenthesis();
+            return builder;
+        }
     }
 }

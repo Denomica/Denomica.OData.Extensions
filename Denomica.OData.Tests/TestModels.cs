@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Denomica.OData.Tests
 {
-    public class Person
+    public class Person : Document
     {
-        public Guid Id { get; set; }
-
         public string FirstName { get; set; } = null!;
 
         public string LastName { get; set; } = null!;
@@ -17,6 +15,9 @@ namespace Denomica.OData.Tests
         public DateTime DateOfBirth { get; set; }
 
         public string? MobilePhone { get; set; }
+
+        public string? Hometown { get; set; }
+
     }
 
     public class Employee : Person
@@ -28,5 +29,22 @@ namespace Denomica.OData.Tests
         public Employee Manager { get; set; } = null!;
 
         public Person? EmergencyContact { get; set; }
+
+        public TimeSpan? DailyWorkingTime { get; set; }
+
+    }
+
+    public class Document
+    {
+        public Document()
+        {
+            this.Id = Guid.NewGuid().ToString();
+            this.Partition = this.GetType().Name;
+        }
+
+        public string Id { get; set; } = null!;
+
+        public string? Partition { get; set; }
+
     }
 }
