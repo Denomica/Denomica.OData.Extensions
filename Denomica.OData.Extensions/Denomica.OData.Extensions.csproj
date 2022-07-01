@@ -6,7 +6,7 @@
 	  <PackageReadmeFile>readme.md</PackageReadmeFile>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>0.9.4-preview</Version>
+	  <Version>0.9.5-preview</Version>
 	  <Description>Utilities for processing OData parameters in an HTTP request.</Description>
 	  <RepositoryUrl>https://github.com/Denomica/Denomica.OData.Extensions</RepositoryUrl>
 	  <PackageTags>OData</PackageTags>
