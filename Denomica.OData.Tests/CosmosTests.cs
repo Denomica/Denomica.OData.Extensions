@@ -235,6 +235,17 @@ namespace Denomica.OData.Tests
             Assert.IsFalse(results.Any(x => x.Id == e2.Id));
         }
 
+        [TestMethod]
+        public void CreateQueryDefinition13()
+        {
+            var uriParser = new EdmModelBuilder()
+                .AddEntityType<Employee>("Id", "employees")
+                .Build()
+                .CreateUriParser("/employees?$filter=hometown ne 'Helsinki'");
+
+            var queryDef = uriParser.CreateQueryDefinition();
+        }
+
 
 
         /// <summary>
