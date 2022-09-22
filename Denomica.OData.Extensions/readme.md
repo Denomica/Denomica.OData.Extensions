@@ -10,6 +10,10 @@ The documentation for this library is available on the [library wiki](https://gi
 
 ## Versions
 
+### 1.0.0
+
+First stable version of the library.
+
 ### 0.9.x-preview
 
 Preview versions that are used to finalize the functionality.
