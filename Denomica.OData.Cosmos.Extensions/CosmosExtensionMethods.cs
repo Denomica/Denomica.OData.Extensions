@@ -138,6 +138,7 @@ namespace Denomica.OData.Cosmos.Extensions
                 case BinaryOperatorKind.GreaterThanOrEqual:
                 case BinaryOperatorKind.LessThan:
                 case BinaryOperatorKind.LessThanOrEqual:
+                case BinaryOperatorKind.NotEqual:
                     builder
                         .AppendFilterNode(node.Left)
                         .AppendQueryTextIf(" =", node.OperatorKind == BinaryOperatorKind.Equal)
