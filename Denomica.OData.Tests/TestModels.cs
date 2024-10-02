@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace Denomica.OData.Tests
 {
+    public enum Gender
+    {
+        Unspecified = -1,
+        Male = 1,
+        Femaile = 2,
+        Both = 3,
+        None = 0
+    }
+
     public class Person : Document
     {
         public string FirstName { get; set; } = null!;
@@ -18,6 +27,7 @@ namespace Denomica.OData.Tests
 
         public string? Hometown { get; set; }
 
+        public Gender Gender { get; set; }
     }
 
     public class Employee : Person
@@ -34,6 +44,20 @@ namespace Denomica.OData.Tests
 
     }
 
+    public enum VersionState
+    {
+        Draft,
+        Current,
+        Archived
+    }
+
+    public class VersionedDocument : Document
+    {
+        public VersionedDocument? PreviousVersion { get; set; }
+
+        public VersionState State { get; set; }
+    }
+
     public class Document
     {
         public Document()
@@ -47,4 +71,5 @@ namespace Denomica.OData.Tests
         public string? Partition { get; set; }
 
     }
+
 }

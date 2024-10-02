@@ -144,6 +144,40 @@ namespace Denomica.OData.Tests
             }
         }
 
+        [TestMethod]
+        public void BuildModel07()
+        {
+            var model = new EdmModelBuilder()
+                .AddEntityType<Employee>()
+                .Build();
+
+            var employee = model.FindEntityType<Employee>();
+            Assert.IsNotNull(employee);
+
+            foreach (var prop in typeof(Employee).GetProperties())
+            {
+                var name = prop.Name.ToCamelCase();
+                Assert.IsNotNull(employee.FindProperty(name), $"The {employee.FullName} entity type must have a declared property '{name}'.");
+            }
+        }
+
+        [TestMethod]
+        public void BuildModel08()
+        {
+            var model = new EdmModelBuilder()
+                .AddEntityType<VersionedDocument>("Id", "documents")
+                .Build();
+
+            var doc = model.FindEntityType<VersionedDocument>();
+            Assert.IsNotNull(doc);
+
+            foreach(var prop in typeof(VersionedDocument).GetProperties())
+            {
+                var name = prop.Name.ToCamelCase();
+                Assert.IsNotNull(doc.FindProperty(name), $"The {doc.FullName} entity type must have a declared property '{name}'.");
+            }
+        }
+
 
 
         [TestMethod]
@@ -288,6 +322,19 @@ namespace Denomica.OData.Tests
 
             Assert.AreEqual(10, top);
             Assert.AreEqual(5, skip);
+        }
+
+        [TestMethod]
+        public void ParseUri11()
+        {
+            // Make sure that the Uri parser can be created when filtering on a property that is defined in a base class of the entity type specified in the model builder.
+            var parser = new EdmModelBuilder()
+                .AddEntityType<Employee>("Id")
+                .CreateUriParser<Employee>("/employees?$filter=hometown eq 'Helsinki'");
+
+            var filter = parser.ParseFilter();
+            Assert.IsNotNull(filter);
+
         }
     }
 }

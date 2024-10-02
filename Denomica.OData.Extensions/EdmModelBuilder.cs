@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Denomica.OData.Extensions
@@ -136,28 +137,59 @@ namespace Denomica.OData.Extensions
                 flags |= BindingFlags.DeclaredOnly;
             }
 
+            Action<IEnumerable<PropertyInfo>, Func<PropertyInfo, PropertyConfiguration>> propHandler = (piArr, confGetter) =>
+            {
+                foreach(var p in piArr)
+                {
+                    var conf = confGetter(p);
+                    conf.Name = this.ModifyPropertyName(p.Name);
+                    configs.Add(conf);
+                }
+            };
+
             var simpleProps = from x in entityType.GetProperties(flags)
                               where
                                     (!x.PropertyType.IsClass || x.PropertyType == typeof(string))
                                     && !x.PropertyType.IsArray
                                     && !x.PropertyType.IsEnum
                               select x;
-            foreach(var p in simpleProps)
+
+            propHandler(simpleProps, (pi) =>
             {
-                var propertyConfig = entityConfig.AddProperty(p);
-                propertyConfig.Name = this.ModifyPropertyName(p.Name);
-                configs.Add(propertyConfig);
-            }
+                return entityConfig.AddProperty(pi);
+            });
+
+            //foreach(var p in simpleProps)
+            //{
+            //    var propertyConfig = entityConfig.AddProperty(p);
+            //    propertyConfig.Name = this.ModifyPropertyName(p.Name);
+            //    configs.Add(propertyConfig);
+            //}
+
+            var enumProps = from x in entityType.GetProperties(flags)
+                            where x.PropertyType.IsEnum
+                            select x;
+
+            propHandler(enumProps, (pi) =>
+            {
+                return entityConfig.AddEnumProperty(pi);
+            });
 
             var complexProps = from x in entityType.GetProperties(flags)
                                where this.EntityTypes.Contains(x.PropertyType)
                                select x;
-            foreach(var p in complexProps)
+
+            propHandler(complexProps, (pi) =>
             {
-                var propertyConfig = entityConfig.AddNavigationProperty(p, EdmMultiplicity.ZeroOrOne);
-                propertyConfig.Name = this.ModifyPropertyName(p.Name);
-                configs.Add(propertyConfig);
-            }
+                return entityConfig.AddNavigationProperty(pi, EdmMultiplicity.ZeroOrOne);
+            });
+
+            //foreach(var p in complexProps)
+            //{
+            //    var propertyConfig = entityConfig.AddNavigationProperty(p, EdmMultiplicity.ZeroOrOne);
+            //    propertyConfig.Name = this.ModifyPropertyName(p.Name);
+            //    configs.Add(propertyConfig);
+            //}
 
             return configs;
         }

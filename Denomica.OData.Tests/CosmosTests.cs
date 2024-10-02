@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Cosmos;
 using Denomica.Cosmos.Extensions;
 using System.Text.Json;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Denomica.OData.Tests
 {
@@ -238,6 +239,7 @@ namespace Denomica.OData.Tests
         [TestMethod]
         public void CreateQueryDefinition13()
         {
+            // Create a query definition using a URI parser that filters on a property definied in a base class of the entity type specified on the URI parser.
             var uriParser = new EdmModelBuilder()
                 .AddEntityType<Employee>("Id", "employees")
                 .Build()
@@ -246,6 +248,27 @@ namespace Denomica.OData.Tests
             var queryDef = uriParser.CreateQueryDefinition();
         }
 
+        [TestMethod]
+        public void CreateQueryDefinition14()
+        {
+            var uriParser = new EdmModelBuilder()
+                .AddEntityType<Employee>("Id", "employees")
+                .Build()
+                .CreateUriParser("/employees?$filter=gender eq -1");
+
+            var queryDef = uriParser.CreateQueryDefinition();
+        }
+
+        [TestMethod]
+        public void CreateQueryDefinition15()
+        {
+            var uriParser = new EdmModelBuilder()
+                .AddEntityType<Person>("Id", "persons")
+                .Build()
+                .CreateUriParser("/persons?$filter=gender eq -1");
+
+            var queryDef = uriParser.CreateQueryDefinition();
+        }
 
 
         /// <summary>
