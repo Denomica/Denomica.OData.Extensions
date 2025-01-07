@@ -10,7 +10,11 @@ The documentation for this library is available on the [library wiki](https://gi
 
 ## Versions
 
-### 1.0.0
+### v1.0.1
+
+Updated referenced Nuget packages to non-vulnerable versions.
+
+### v1.0.0
 
 First stable version of the library.
 
