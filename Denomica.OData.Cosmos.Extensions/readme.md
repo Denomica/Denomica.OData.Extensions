@@ -10,9 +10,13 @@ The documentation for this library is available on the [library wiki](https://gi
 
 ## Versions
 
+### v2.0.0
+
+- Updated reference to `Denomica.OData.Extensions` to v2.0.0, which targets .NET Standard 2.1.
+
 ### v1.0.1
 
-Updated referenced Nuget packages to non-vulnerable versions.
+- Updated referenced Nuget packages to non-vulnerable versions.
 
 ### v1.0.0
 
@@ -22,4 +26,4 @@ First stable version of the library. Includes the following fixes.
 
 ### 0.9.x-preview
 
-Preview versions that are used to finalize the functionality.
+- Preview versions that are used to finalize the functionality.
